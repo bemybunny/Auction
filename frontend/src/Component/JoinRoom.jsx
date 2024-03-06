@@ -7,19 +7,18 @@ const JoinRoom = ({ match }) => {
   const handleJoinRoom = () => {
     const socket = io('http://localhost:4000'); 
     socket.emit('joinRoom', inputRoomId);
-
     console.log(`Joining room ${inputRoomId}`);
   };
 
   return (
-    <div>
+    <div className="roomflex">
       <h1>Join Room</h1>
       <input
         type="text"
         value={inputRoomId}
         onChange={(e) => setInputRoomId(e.target.value)}
       />
-      <button onClick={handleJoinRoom}>Join Room</button>
+      <button onClick={handleJoinRoom}><Link to="/join/:inputRoomId">Join Room</Link></button>
     </div>
   );
 };

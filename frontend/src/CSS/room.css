@@ -1,0 +1,33 @@
+.roomrow{
+    display:flex;
+    justify-content: space-between;
+}
+.cardcenter{
+    margin-left:150px;
+    margin-right: 150px;
+}
+.roomcol{
+    display: flex;
+    align-items: center;
+    height:100vh;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.cardcenter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+.cardimage{
+    height:100px;
+    width:100px;
+}
+.players{
+    width:100px;
+    height:30px;
+    background-color: blueviolet;
+    color:white;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}

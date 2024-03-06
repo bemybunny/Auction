@@ -1,0 +1,18 @@
+.homecol{
+    padding-top:50px;
+    width:250px;
+    background-color: rgb(211, 241, 247);
+    height:100vh;
+    display:flex;
+    align-items: center;
+    flex-direction: column;
+    gap:10px;
+}
+.homebox{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    height:70px;
+    width:200px;
+    background-color: rgba(248, 243, 243, 0.911);
+}

@@ -1,0 +1,15 @@
+.card-box{
+    padding:20px;
+    height:400px;
+    width:250px;
+    border:1px solid black;
+}
+.playerimage{
+    height:300px;
+    width:250px;
+}
+.text-justify{
+    display:flex;
+    justify-content: space-between;
+    font-size:14px;
+}

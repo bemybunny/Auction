@@ -1,0 +1,13 @@
+.navbar{
+    padding-left:50px;
+    padding-right:50px;
+    display:flex;
+    justify-content: space-between;
+    height:80px;
+    background-color: rgba(185, 230, 241, 0.993);
+    align-items: center;
+}
+.avatarimage{
+    border-radius: 50%;
+    height:60px;
+}

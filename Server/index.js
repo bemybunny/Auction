@@ -1,42 +1,90 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
+const mongoose = require('mongoose');
 const http = require('http');
-const { Server } = require('socket.io');
+const fileupload = require('express-fileupload');
+const cloudinary = require('cloudinary').v2;
+const Player = require('./playermodal');
+const initializeSocket = require('./Socket');
+const app = express();
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 app.use(cors());
+app.use(express.json());
+app.use(bodyParser.json());
+
+cloudinary.config({
+  cloud_name: 'dckp3ubkg',
+  api_key: '954137826352828',
+  api_secret: 'lF3OAF50khe4Qwn4gbhtlm34xns',
+});
 
 const server = http.createServer(app);
+const io = initializeSocket(server);
 
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-  },
-});
+app.use(fileupload({
+  useTempFiles: true
+}));
 
-const roomLimits = new Map();
-
-io.on('connection', (socket) => {
-  socket.on('joinRoom', ({ roomId }, callback) => {
-    const roomPlayerCount = roomLimits.get(roomId) || 0;
-
-    if (roomPlayerCount >= 2) {
-      callback({ status: 'error', message: 'No seats available in this room' });
-      return;
-    }
-
-    socket.join(roomId);
-    roomLimits.set(roomId, roomPlayerCount + 1);
-    console.log(`User joined room: ${roomId}`);
-    callback({ status: 'success' });
-
-    socket.on('disconnect', () => {
-      roomLimits.set(roomId, Math.max(roomPlayerCount - 1, 0));
-      console.log(`User disconnected from room: ${roomId}`);
-    });
+app.post('/addproduct', (req, res) => {
+  console.log(req);
+  const file=req.files.file;
+  cloudinary.uploader.upload(file.tempFilePath, (err, result) => {
+      console.log(result);
+      const player = new Player({
+        _id: new mongoose.Types.ObjectId,
+        name: req.body.name,
+        basePrice: req.body.basePrice,
+        credit: req.body.credits,
+        recentPerformance: req.body.recentPerformance,
+        image: result.secure_url,
+      });
+      player.save()
+        .then(result => {
+          console.log(result);
+          res.status(200).json({
+            new_product: result,
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).json({
+            error: 'Error saving player to the database.',
+          });
+        });
+  })
   });
-});
+
+app.get('/listproduct',async (req,res)=>{
+  try{
+    const allPlayers = await Player.find();
+    res.status(200).json(allPlayers);
+  }catch(error){
+    console.log(error);
+    res.status(500).json({error:'Error in fetching players from the database.'})
+  }
+})
+
+app.delete('/deletePlayer/:id',async(req,res)=>{
+  const player_id = req.params.id;
+  console.log(player_id)
+  try{
+    await Player.deleteOne({_id:player_id})
+  }catch(error){
+    console.log(error);
+    res.status(500).json({error:'Error in deleting the data'})
+  }
+})
+mongoose.connect('mongodb+srv://leenagupta993:xb8bfGwsWgE2SMeh@cluster0.2asxmeo.mongodb.net/your-database-name')
+  .then(() => {
+    console.log('MongoDB is connected');
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err);
+  });
 
 server.listen(4000, () => {
   console.log('Server is running at 4000');

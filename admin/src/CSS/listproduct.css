@@ -1,0 +1,16 @@
+.listproduct{
+    margin:50px;
+}
+.playerow{
+    padding:10px;
+    display:flex;
+    height:70px;
+    align-items: center;
+    justify-content: space-between;
+}
+.playerimage{
+    height:50px;
+}
+.playercross{
+    height:15px;
+}

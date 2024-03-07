@@ -16,7 +16,7 @@ useEffect(()=>{
     }
   }
   fetchData();
-},[handleDelete])
+},[])
 
 
 const handleDelete=async(id)=>{

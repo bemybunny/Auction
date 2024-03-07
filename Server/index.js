@@ -30,8 +30,11 @@ app.use(fileupload({
 }));
 
 app.post('/addproduct', (req, res) => {
-  console.log(req);
-  const file=req.files.file;
+  console.log(req.files);
+  const file=req.files.file?req.files.file:null;
+  if(file===null){
+    return res.status(500).json({error:'Error file is null'})
+  }
   cloudinary.uploader.upload(file.tempFilePath, (err, result) => {
       console.log(result);
       const player = new Player({
@@ -55,7 +58,7 @@ app.post('/addproduct', (req, res) => {
             error: 'Error saving player to the database.',
           });
         });
-  })
+ })
   });
 
 app.get('/listproduct',async (req,res)=>{

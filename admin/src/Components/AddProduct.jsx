@@ -9,12 +9,12 @@ const AddProduct = () => {
     basePrice: '',
     credits: '',
     recentPerformance: '',
-    image:null,
+    file:null,
   });
   
   const handleChange = (e) => {
     const { name, value ,files} = e.target;
-    if(name==='image' && files && files.length > 0){
+    if(name==='file' && files && files.length > 0){
       setFormField({
         ...formField,
         [name]: files[0],
@@ -34,7 +34,7 @@ const AddProduct = () => {
     formData.append('basePrice', formField.basePrice);
     formData.append('credits', formField.credits);
     formData.append('recentPerformance', formField.recentPerformance);
-    formData.append('file', formField.image);
+    formData.append('file', formField.file);
   
     try {
       const response = await axios.post('http://localhost:4000/addproduct', formData);
@@ -43,7 +43,7 @@ const AddProduct = () => {
         basePrice: '',
         credits: '',
         recentPerformance: '',
-        image: null,
+        file: null,
       });
       console.log(response.data);
     } catch (error) {
@@ -98,11 +98,12 @@ const AddProduct = () => {
         <div className="formele">
             <span>Upload Image</span>
             <div className="formelebox">
-              <input className="simpleinput" value={formField.image} type="file" name="file" accept="image/*" onChange={handleChange}/>
+              <input className="simpleinput" type="file" name="file" accept="image/*" onChange={handleChange}/>
               {formField.image === null ? (
                 <img className="formfieldImage" src={uploadImage} alt="Upload Area" />
               ) : (
-                <img className="formfieldImage" src={URL.createObjectURL(formField.image)} alt="Uploaded" />
+                <></>
+                // <img className="formfieldImage" src={URL.createObjectURL(formField.image)} alt="Uploaded" />
               )}
             </div>
          

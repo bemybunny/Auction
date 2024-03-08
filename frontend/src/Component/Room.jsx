@@ -3,15 +3,34 @@ import '../CSS/room.css'
 import io from 'socket.io-client';
 import Card from './Card';
 import axios from 'axios'
+import { useParams } from 'react-router-dom';
+
+
 const Room = () => {
+  const { inputRoomId } = useParams();
+  //console.log(inputRoomId);
+
     const [currImageIndex,setCurrentImageIndex]=useState(0);
     const [roomPlayers,setRoomPlayers] = useState(0);
     const [player,SetPlayer] = useState([]);
+    const [user,setUser] = useState([]);
+    useEffect(()=>{
+      const fetchData=async()=>{
+        try{
+          const User = await axios.get(`http://localhost:4000/getUser/${inputRoomId}`)
+          console.log({"User":User});
+          setUser(User.data);
+        }catch(error){
+          console.log(error);
+        }
+      }
+      fetchData();
+    },[])
     useEffect(()=>{
       const fetchData = async()=>{
         try{
           const response = await axios.get('http://localhost:4000/listProduct')
-          console.log(response);
+          // console.log(response);
           SetPlayer(response.data);
         }catch(err){
           console.log(err);
@@ -21,7 +40,7 @@ const Room = () => {
     },[])
     useEffect(()=>{
         const socket = io('http://localhost:4000'); 
-        socket.emit('joinRoom',{roomId:'yourRoomId'},(response)=>{
+        socket.emit('joinRoom',{roomId:inputRoomId},(response)=>{
             if(response.status==='success'){
                 console.log('successfully joined room');
             }else{

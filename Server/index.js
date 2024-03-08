@@ -9,6 +9,7 @@ const initializeSocket = require('./Socket');
 const app = express();
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const User = require('./modals');
 
 dotenv.config();
 
@@ -65,6 +66,17 @@ app.get('/listproduct',async (req,res)=>{
   try{
     const allPlayers = await Player.find();
     res.status(200).json(allPlayers);
+  }catch(error){
+    console.log(error);
+    res.status(500).json({error:'Error in fetching players from the database.'})
+  }
+})
+app.get('/getUser/:inputRoomId',async (req,res)=>{
+  const roomId=req.params.inputRoomId;
+  console.log({"getUserid":roomId});
+  try{
+    const allUser = await User.find({RoomId:roomId});
+    res.status(200).json(allUser);
   }catch(error){
     console.log(error);
     res.status(500).json({error:'Error in fetching players from the database.'})

@@ -10,18 +10,15 @@ const userSchema = new Schema({
         type: Array,
         default: [],
     },
-    NumberofPlayers: {
+    RoomId: {
+        type: String,
+        required:true,
+    },
+    position: {
         type: Number,
-        default: 0,
+        required: true,
     },
-    want:{
-        type:boolean,
-        default:0,
-    },
-    swipe:{
-        type:boolean,
-        default:0,
-    }
 });
-const User = mongoose.model('User',userSchema);
+
+const User = mongoose.model('User', userSchema);
 module.exports = User;

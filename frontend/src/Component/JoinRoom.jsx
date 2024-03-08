@@ -3,11 +3,12 @@ import io from 'socket.io-client';
 
 const JoinRoom = ({ match }) => {
   const [inputRoomId, setInputRoomId] = useState(match.params.roomId);
-
+  console.log({"inputroomid":inputRoomId});
   const handleJoinRoom = () => {
     const socket = io('http://localhost:4000'); 
-    socket.emit('joinRoom', inputRoomId);
-    console.log(`Joining room ${inputRoomId}`);
+    socket.emit('joinRoom', {roomId:inputRoomId},(response)=>{
+      console.log(response);
+    });
   };
 
   return (
@@ -18,7 +19,7 @@ const JoinRoom = ({ match }) => {
         value={inputRoomId}
         onChange={(e) => setInputRoomId(e.target.value)}
       />
-      <button onClick={handleJoinRoom}><Link to="/join/:inputRoomId">Join Room</Link></button>
+      <button onClick={handleJoinRoom}><Link to="/join/:inputRoomId" >Join Room</Link></button>
     </div>
   );
 };

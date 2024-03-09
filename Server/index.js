@@ -29,16 +29,36 @@ const io = initializeSocket(server);
 app.use(fileupload({
   useTempFiles: true
 }));
+app.post('/updateTeam',async(req,res)=>{
+  const {count,index,userId}=req.body;
+  try{
+    const user = await User.findOne({ _id: userId });
+    if (user && user.team) {
+      user.team[index] = count;
+      await user.save(); 
 
-app.post('/addproduct', (req, res) => {
+      console.log(user);
+      res.status(200).send({ message: 'Team updated successfully' });
+    } else {
+      res.status(404).send({ message: 'User or team not found' });
+    }
+
+  }catch(error){
+    res.send({"Error in update team":Error})
+  }
+})
+app.post('/addproduct', async(req, res) => {
   console.log(req.files);
   const file=req.files.file?req.files.file:null;
   if(file===null){
     return res.status(500).json({error:'Error file is null'})
   }
-  cloudinary.uploader.upload(file.tempFilePath, (err, result) => {
+  cloudinary.uploader.upload(file.tempFilePath, async(err, result) => {
       console.log(result);
+      const lastPlayer=await Player.findOne().sort({index:-1});
+      const newIndex = lastPlayer?lastPlayer.index+1:0;
       const player = new Player({
+        index:newIndex,
         _id: new mongoose.Types.ObjectId,
         name: req.body.name,
         basePrice: req.body.basePrice,
@@ -93,6 +113,7 @@ app.delete('/deletePlayer/:id',async(req,res)=>{
     res.status(500).json({error:'Error in deleting the data'})
   }
 })
+
 mongoose.connect('mongodb+srv://leenagupta993:xb8bfGwsWgE2SMeh@cluster0.2asxmeo.mongodb.net/your-database-name')
   .then(() => {
     console.log('MongoDB is connected');

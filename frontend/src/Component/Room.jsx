@@ -8,24 +8,12 @@ import { useParams } from 'react-router-dom';
 
 const Room = () => {
   const { inputRoomId } = useParams();
-  //console.log(inputRoomId);
 
     const [currImageIndex,setCurrentImageIndex]=useState(0);
     const [roomPlayers,setRoomPlayers] = useState(0);
     const [player,SetPlayer] = useState([]);
     const [user,setUser] = useState([]);
-    useEffect(()=>{
-      const fetchData=async()=>{
-        try{
-          const User = await axios.get(`http://localhost:4000/getUser/${inputRoomId}`)
-          console.log({"User":User});
-          setUser(User.data);
-        }catch(error){
-          console.log(error);
-        }
-      }
-      fetchData();
-    },[])
+ 
     useEffect(()=>{
       const fetchData = async()=>{
         try{
@@ -55,6 +43,18 @@ const Room = () => {
             socket.disconnect();
           };
     }, []);
+    useEffect(()=>{
+      const fetchData=async()=>{
+        try{
+          const User = await axios.get(`http://localhost:4000/getUser/${inputRoomId}`)
+          console.log({"User":User});
+          setUser(User.data);
+        }catch(error){
+          console.log(error);
+        }
+      }
+      fetchData();
+    },[roomPlayers])
     const handleShowNextImage=()=>{
         if(currImageIndex==player.length){
           setCurrentImageIndex(0);
@@ -68,20 +68,28 @@ const Room = () => {
         <div >
           {roomPlayers >= 1 ? (
             <div className="roomcol">
-              <div className="players">{roomPlayers}</div>
+             
               <div className="roomrow">
-                    <div className="players">{roomPlayers}</div>
+              {user.map((userData, index) => (
+              <div key={userData._id} className="players">
+                User {index + 1} Position: {userData.position}
+              </div>
+            ))}
                     <div className="cardcenter">
-                    {player.map((ele,index) => (
-                    <div key={ele._id} style={{ display: index === currImageIndex ? 'block' : 'none' }}>
-                        <Card card={ele}/>
+                     { user.map((userData,index)=>{
+                        return <div key={index}>
+                      {player.map((ele,index) => (
+                      <div key={ele._id} style={{ display: index === currImageIndex ? 'block' : 'none' }}>
+                        <Card card={ele} userId={userData._id}/>
                     </div>
                     ))}
+                        </div>
+                      })}
+                   
                     <button onClick={handleShowNextImage}>Show Next Image</button>
                     </div>
-                    <div className="players">{roomPlayers}</div>
+    
               </div>
-              <div className="players">{roomPlayers}</div>
             </div>
           ) : (
             <div>

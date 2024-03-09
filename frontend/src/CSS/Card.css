@@ -1,8 +1,10 @@
 .card-box{
     padding:20px;
-    height:360px;
+    height:400px;
     width:250px;
-    border:1px solid black;
+    border:1px solid white;
+    color:white;
+    background-color: rgba(48, 74, 99, 0.692);
 }
 .playerimage{
     height:300px;
@@ -12,4 +14,20 @@
     display:flex;
     justify-content: space-between;
     font-size:14px;
+}
+.wantbtn{
+    padding:8px;
+    width:80px;
+    background-color:purple;
+    border:none;
+    color:white;
+    font-weight: 600;
+}
+.wantbtngreen{
+    padding:8px;
+    width:80px;
+    background-color:rgb(80, 197, 26);
+    border:none;
+    color:white;
+    font-weight: 600;
 }

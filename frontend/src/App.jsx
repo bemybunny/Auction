@@ -10,7 +10,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<StartPage/>}/>
           <Route path="/selectroom" element={<SelectRoom/>}/>
-          <Route path="/join/:inputRoomId" element={<Room/>} />
+          <Route path="/join/:inputRoomId" element={<Room />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -16,7 +16,7 @@ const Card = (props) => {
     }
     useEffect(()=>{
       console.log("count Changed",count);
-      fetchData=async()=>{
+      const fetchData=async()=>{
         try{
           const response = await axios.post('http://localhost:4000/updateTeam',{
             count: count, 

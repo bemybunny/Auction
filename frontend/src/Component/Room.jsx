@@ -13,6 +13,7 @@ const Room = () => {
     const [roomPlayers,setRoomPlayers] = useState(0);
     const [player,SetPlayer] = useState([]);
     const [user,setUser] = useState([]);
+    const [userId,setUserId]=useState(null);
  
     useEffect(()=>{
       const fetchData = async()=>{
@@ -34,6 +35,10 @@ const Room = () => {
             }else{
                 console.error(`Error joining room: ${response.message}`);
             }
+        })
+        socket.on('userSaved',({userId})=>{
+          console.log(`User Id saved: ${userId}`);
+          setUserId(userId);
         })
         socket.on('updateRoomPlayers', (count) => {
             setRoomPlayers(count);
@@ -76,16 +81,12 @@ const Room = () => {
               </div>
             ))}
                     <div className="cardcenter">
-                     { user.map((userData,index)=>{
-                        return <div key={index}>
+
                       {player.map((ele,index) => (
                       <div key={ele._id} style={{ display: index === currImageIndex ? 'block' : 'none' }}>
-                        <Card card={ele} userId={userData._id}/>
+                        <Card card={ele} userId={userId} />
                     </div>
                     ))}
-                        </div>
-                      })}
-                   
                     <button onClick={handleShowNextImage}>Show Next Image</button>
                     </div>
     

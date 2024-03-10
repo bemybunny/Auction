@@ -41,6 +41,10 @@ const initializeSocket = (server) => {
       try {
         const savedUser = await newUser.save();
         console.log('User created and joined room:', savedUser);
+          // Emit the user ID to the client socket
+          console.log({"savedUser":savedUser._id})
+        socket.emit('userSaved', { userId: savedUser._id });
+
         callback({ status: 'success', message: 'Successfully joined the room' });
     } catch (err) {
         console.error(err);

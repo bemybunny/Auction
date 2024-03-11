@@ -5,7 +5,6 @@ import Card from './Card';
 import axios from 'axios'
 import { useParams } from 'react-router-dom';
 
-
 const Room = () => {
   const { inputRoomId } = useParams();
 
@@ -14,7 +13,32 @@ const Room = () => {
     const [player,SetPlayer] = useState([]);
     const [user,setUser] = useState([]);
     const [userId,setUserId]=useState(null);
- 
+    const [timer, setTimer] = useState(10); // User timer in seconds
+    const [want,setWant]=useState(0);
+    const socket = io('http://localhost:4000'); 
+    useEffect(()=>{
+        socket.emit('joinRoom',{roomId:inputRoomId},(response)=>{
+            if(response.status==='success'){
+                console.log('successfully joined room');
+            }else{
+                console.error(`Error joining room: ${response.message}`);
+            }
+        })
+        socket.on('userSaved', ({ userId, isNewUser }) => {
+          if (isNewUser) {
+              console.log(`New user joined. User Id saved: ${userId}`);
+              setUserId(userId);
+          }
+      });
+        socket.on('updateRoomPlayers', (count) => {
+            setRoomPlayers(count);
+          });
+      
+          return () => {
+            socket.disconnect();
+          };
+    }, []);
+     
     useEffect(()=>{
       const fetchData = async()=>{
         try{
@@ -28,44 +52,43 @@ const Room = () => {
       fetchData();
     },[])
     useEffect(()=>{
-        const socket = io('http://localhost:4000'); 
-        socket.emit('joinRoom',{roomId:inputRoomId},(response)=>{
-            if(response.status==='success'){
-                console.log('successfully joined room');
-            }else{
-                console.error(`Error joining room: ${response.message}`);
-            }
-        })
-        socket.on('userSaved',({userId})=>{
-          console.log(`User Id saved: ${userId}`);
-          setUserId(userId);
-        })
-        socket.on('updateRoomPlayers', (count) => {
-            setRoomPlayers(count);
-          });
-      
-          return () => {
-            socket.disconnect();
-          };
-    }, []);
-    useEffect(()=>{
       const fetchData=async()=>{
         try{
           const User = await axios.get(`http://localhost:4000/getUser/${inputRoomId}`)
-          console.log({"User":User});
+          //console.log({"User":User});
           setUser(User.data);
+          for (let i = 0; i < User.data.length; i++) {
+            if (User.data[i].team[currImageIndex] === true) {
+              setWant(want + 1);
+            }
+          }
+         console.log({"want":want});
         }catch(error){
           console.log(error);
         }
       }
       fetchData();
     },[roomPlayers])
+    
+    useEffect(() => {
+      if(roomPlayers>=2){
+      const timerInterval = setInterval(() => {
+        if (timer > 0) {
+          setTimer((prevTimer) => prevTimer - 1);
+        }
+      }, 1000);
+  
+      return () => clearInterval(timerInterval);}
+    }, [timer,roomPlayers]);
+    
+
     const handleShowNextImage=()=>{
         if(currImageIndex==player.length){
           setCurrentImageIndex(0);
         }
         if(currImageIndex<player.length){
-            setCurrentImageIndex(currImageIndex+1);
+          setCurrentImageIndex((prevIndex) => prevIndex + 1);
+            setTimer(10);
         }
     }
 
@@ -75,16 +98,31 @@ const Room = () => {
             <div className="roomcol">
              
               <div className="roomrow">
-              {user.map((userData, index) => (
-              <div key={userData._id} className="players">
-                User {index + 1} Position: {userData.position}
-              </div>
-            ))}
+              {
+                user.map((userData, index) => (
+                  <div
+                    key={userData._id}
+                    className="players"
+                    style={{
+                      position: 'absolute',
+                      top: index === 0 ? 0 : 'auto',
+                      right: index === 1 ? 0 : 'auto',
+                      bottom: index === 2 ? 0 : 'auto',
+                      left: index === 3 ? 0 : 'auto',
+                    }}
+                  >
+                     
+                    User {index + 1} Position: {userData.position} timer={timer} 
+                  </div>
+                ))
+              }
                     <div className="cardcenter">
 
                       {player.map((ele,index) => (
                       <div key={ele._id} style={{ display: index === currImageIndex ? 'block' : 'none' }}>
-                        <Card card={ele} userId={userId} />
+
+                     { userId!==null && (<Card card={ele} userId={userId} />)}
+                       
                     </div>
                     ))}
                     <button onClick={handleShowNextImage}>Show Next Image</button>

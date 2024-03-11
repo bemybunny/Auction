@@ -26,7 +26,7 @@ const initializeSocket = (server) => {
       const existingUser = await User.findOne({ RoomId: roomId, position: roomPlayerCount });
 
       if (existingUser) {
-        console.log('User with the same id and position already exists:', existingUser);
+        //console.log('User with the same id and position already exists:', existingUser);
         // Handle the case where a user with the same id and position already exists
         callback({ status: 'error', message: 'User with the same id and position already exists' });
         return;
@@ -43,9 +43,8 @@ const initializeSocket = (server) => {
         console.log('User created and joined room:', savedUser);
           // Emit the user ID to the client socket
           console.log({"savedUser":savedUser._id})
-        socket.emit('userSaved', { userId: savedUser._id });
-
-        callback({ status: 'success', message: 'Successfully joined the room' });
+          io.to(roomId).emit('userSaved', { userId: savedUser._id, isNewUser: true });
+          callback({ status: 'success', message: 'Successfully joined the room' });
     } catch (err) {
         console.error(err);
         callback({ status: 'error', message: 'Error creating user' });

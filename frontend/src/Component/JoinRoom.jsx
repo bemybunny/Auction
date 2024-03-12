@@ -7,7 +7,7 @@ const JoinRoom = ({ match }) => {
   const handleJoinRoom = () => {
     const socket = io('http://localhost:4000'); 
     socket.emit('joinRoom', {roomId:inputRoomId},(response)=>{
-      console.log(response);
+      //console.log(response);
     });
   };
 

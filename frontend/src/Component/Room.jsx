@@ -6,7 +6,7 @@ import axios from 'axios'
 import { useParams } from 'react-router-dom';
 
 const Room = () => {
-  const { inputRoomId } = useParams();
+    const { inputRoomId } = useParams();
 
     const [currImageIndex,setCurrentImageIndex]=useState(0);
     const [roomPlayers,setRoomPlayers] = useState(0);
@@ -16,7 +16,22 @@ const Room = () => {
     const [timer, setTimer] = useState(10); // User timer in seconds
     const [want,setWant]=useState(0);
     const socket = io('http://localhost:4000'); 
+
+    
+
     useEffect(()=>{
+
+      const handleUserSaved = ({ userId, isNewUser }) => {
+        if (isNewUser) {
+          console.log(`New user joined. User Id saved: ${userId}`);
+          setUserId(userId);
+        }
+      };
+    
+      const handleUpdateRoomPlayers = (count) => {
+        setRoomPlayers(count);
+      };
+    
         socket.emit('joinRoom',{roomId:inputRoomId},(response)=>{
             if(response.status==='success'){
                 console.log('successfully joined room');
@@ -24,17 +39,12 @@ const Room = () => {
                 console.error(`Error joining room: ${response.message}`);
             }
         })
-        socket.on('userSaved', ({ userId, isNewUser }) => {
-          if (isNewUser) {
-              console.log(`New user joined. User Id saved: ${userId}`);
-              setUserId(userId);
-          }
-      });
-        socket.on('updateRoomPlayers', (count) => {
-            setRoomPlayers(count);
-          });
-      
+          socket.on('userSaved', handleUserSaved);
+          socket.on('updateRoomPlayers', handleUpdateRoomPlayers);
+        
           return () => {
+            socket.off('userSaved', handleUserSaved);
+            socket.off('updateRoomPlayers', handleUpdateRoomPlayers);
             socket.disconnect();
           };
     }, []);
@@ -70,7 +80,9 @@ const Room = () => {
       }
       fetchData();
     },[timer,currImageIndex,roomPlayers])
+    // const handlebid=()={
 
+    // }
     useEffect(() => {
       if(roomPlayers>=1){
       const timerInterval = setInterval(async() => {
@@ -92,23 +104,18 @@ const Room = () => {
           }catch(error){
             console.log(error);
           }
-          
           handleShowNextImage();
           setWant(0);
           setTimer(10);
+        }else if(want>=1){
+          //handleBid();
         }
       }, 1000);
       return () => clearInterval(timerInterval);}
-    }, [want,roomPlayers,currImageIndex]);
+    }, [timer,want,roomPlayers,currImageIndex]);
 
     const handleShowNextImage=()=>{
-        if(currImageIndex===player.length){
-          setCurrentImageIndex(0);
-        }
-        if(currImageIndex<player.length){
-          setCurrentImageIndex((prevIndex) => prevIndex + 1);
-            setTimer(10);
-        }
+          setCurrentImageIndex((prevIndex) => (prevIndex + 1)%player.length);
     }
 
     return (
@@ -148,7 +155,6 @@ const Room = () => {
                        
                     </div>
                     ))}
-                    <button onClick={handleShowNextImage}>Show Next Image</button>
                     </div>
     
               </div>

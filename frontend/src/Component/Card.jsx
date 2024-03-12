@@ -7,15 +7,15 @@ const Card = (props) => {
    const [count,setCount]=useState(false);
     const { name, image, basePrice, credit, recentPerformance,index } = props.card;
     const userId=props.userId;
-    console.log({"userId":userId});
-    console.log({"index":index});
+    // console.log({"userId":userId});
+    // console.log({"index":index});
     const handlecount = async()=>{
-      console.log(count);
+     // console.log(count);
       setCount(!count)
      
     }
     useEffect(()=>{
-      console.log("count Changed",count);
+      //console.log("count Changed",count);
       if (userId === null) {
         return;
       }

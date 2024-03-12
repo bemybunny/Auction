@@ -26,8 +26,6 @@ const initializeSocket = (server) => {
       const existingUser = await User.findOne({ RoomId: roomId, position: roomPlayerCount });
 
       if (existingUser) {
-        //console.log('User with the same id and position already exists:', existingUser);
-        // Handle the case where a user with the same id and position already exists
         callback({ status: 'error', message: 'User with the same id and position already exists' });
         return;
       }

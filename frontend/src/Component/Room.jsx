@@ -57,33 +57,52 @@ const Room = () => {
           const User = await axios.get(`http://localhost:4000/getUser/${inputRoomId}`)
           //console.log({"User":User});
           setUser(User.data);
+          if(timer==0){
           for (let i = 0; i < User.data.length; i++) {
             if (User.data[i].team[currImageIndex] === true) {
               setWant(want + 1);
             }
           }
-         console.log({"want":want});
+         console.log({"want":want});}
         }catch(error){
           console.log(error);
         }
       }
       fetchData();
-    },[roomPlayers])
-    
+    },[timer,currImageIndex,roomPlayers])
+
     useEffect(() => {
-      if(roomPlayers>=2){
-      const timerInterval = setInterval(() => {
+      if(roomPlayers>=1){
+      const timerInterval = setInterval(async() => {
         if (timer > 0) {
           setTimer((prevTimer) => prevTimer - 1);
+        }else if(want===0){
+          console.log("going in want 0");
+          handleShowNextImage();
+          setWant(0);
+          setTimer(10);
+        }else if(want===1){
+          console.log("going in want 1");
+          try{
+            const response = await axios.put(`http://localhost:4000/updateAmount/${inputRoomId}`,{
+              basePrice: player[currImageIndex].basePrice,
+              currImageIndex
+            })
+            console.log(response.data);
+          }catch(error){
+            console.log(error);
+          }
+          
+          handleShowNextImage();
+          setWant(0);
+          setTimer(10);
         }
       }, 1000);
-  
       return () => clearInterval(timerInterval);}
-    }, [timer,roomPlayers]);
-    
+    }, [want,roomPlayers,currImageIndex]);
 
     const handleShowNextImage=()=>{
-        if(currImageIndex==player.length){
+        if(currImageIndex===player.length){
           setCurrentImageIndex(0);
         }
         if(currImageIndex<player.length){
@@ -112,7 +131,11 @@ const Room = () => {
                     }}
                   >
                      
-                    User {index + 1} Position: {userData.position} timer={timer} 
+                    <span>User {index + 1} </span> 
+                    <span>amount:{userData.amount} </span>
+                    <span>Position: {userData.position} </span>
+                    <span> timer={timer} </span>
+                   
                   </div>
                 ))
               }

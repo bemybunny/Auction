@@ -33,7 +33,7 @@ const initializeSocket = (server) => {
       }
       const newUser = new User({
         _id: new mongoose.Types.ObjectId(),
-        amount: 100000,
+        amount: 10000000,
         team: [],
         RoomId: roomId,
         position: roomPlayerCount,

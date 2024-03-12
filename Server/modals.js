@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     amount: {
         type: Number,
-        default: 100000,
+        default: 10000000,
     },
     team: {
         type: Array,

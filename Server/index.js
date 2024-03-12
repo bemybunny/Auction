@@ -102,7 +102,29 @@ app.get('/getUser/:inputRoomId',async (req,res)=>{
     res.status(500).json({error:'Error in fetching players from the database.'})
   }
 })
-
+app.put('/updateAmount/:inputRoomId',async(req,res)=>{
+  const inputRoomId=req.params.inputRoomId;
+  const currImageIndex=req.body.currImageIndex;
+  const baseprice=req.body.basePrice;
+  console.log({"currImageIndex":currImageIndex});
+  console.log({"basePrice":baseprice});
+  try{
+    const user = await User.find({RoomId:inputRoomId});
+    console.log({"user":user});
+    for(let i=0;i<user.length;i++){
+        if(user[i].team && user[i].team[currImageIndex]===true){
+          user[i].amount-=baseprice;
+          await user[i].save();
+      }
+    }
+   
+    console.log({"user":user});
+    res.status(200).json({user});
+  }catch(error){
+    console.log(error);
+    res.status(500).json({error:'Error in deleting the data'})
+  }
+})
 app.delete('/deletePlayer/:id',async(req,res)=>{
   const player_id = req.params.id;
   console.log(player_id)

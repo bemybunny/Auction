@@ -14,6 +14,10 @@ const userSchema = new Schema({
         type: String,
         required:true,
     },
+    socketId:{
+        type:String,
+        required:true,
+    },
     position: {
         type: Number,
         required: true,

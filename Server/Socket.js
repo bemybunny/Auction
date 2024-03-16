@@ -21,9 +21,13 @@ const initializeSocket = (server) => {
         callback({ status: 'error', message: 'No seats available in this room' });
         return;
       }
+      let socketId;
+      // socket.on('sendSocket',(socketId)=>{
+      //   socketId=socketId;
+      // })
       socket.join(roomId);
       callback({ status: 'success' });
-      const existingUser = await User.findOne({ RoomId: roomId, position: roomPlayerCount });
+      const existingUser = await User.findOne({ RoomId: roomId, socketId:socketId});
 
       if (existingUser) {
         callback({ status: 'error', message: 'User with the same id and position already exists' });
@@ -35,7 +39,9 @@ const initializeSocket = (server) => {
         team: [],
         RoomId: roomId,
         position: roomPlayerCount,
+        socketId: socket.id,
       });
+      socket.emit('sendsocket',socket.id);
       try {
         const savedUser = await newUser.save();
         console.log('User created and joined room:', savedUser);
@@ -43,10 +49,10 @@ const initializeSocket = (server) => {
           console.log({"savedUser":savedUser._id})
           io.to(roomId).emit('userSaved', { userId: savedUser._id, isNewUser: true });
           callback({ status: 'success', message: 'Successfully joined the room' });
-    } catch (err) {
-        console.error(err);
-        callback({ status: 'error', message: 'Error creating user' });
-    }
+      } catch (err) {
+          console.error(err);
+          callback({ status: 'error', message: 'Error creating user' });
+      }
       
       roomLimits.set(roomId, roomPlayerCount + 1);
       io.to(roomId).emit('updateRoomPlayers', roomLimits.get(roomId));

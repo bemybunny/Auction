@@ -12,42 +12,44 @@ const Room = () => {
     const [roomPlayers,setRoomPlayers] = useState(0);
     const [player,SetPlayer] = useState([]);
     const [user,setUser] = useState([]);
-    const [userId,setUserId]=useState(null);
-    const [timer, setTimer] = useState(10); // User timer in seconds
+
+    const [timer, setTimer] = useState(60); // User timer in seconds
     const [want,setWant]=useState(0);
-    const socket = io('http://localhost:4000'); 
+    const [socket, setSocket] = useState(null);
 
-    
-
-    useEffect(()=>{
-
-      const handleUserSaved = ({ userId, isNewUser }) => {
-        if (isNewUser) {
-          console.log(`New user joined. User Id saved: ${userId}`);
-          setUserId(userId);
-        }
+    useEffect(() => {
+      const socket = io('http://localhost:4000');
+      setSocket(socket); // Set the initialized socket
+      return () => {
+          socket.disconnect();
       };
-    
-      const handleUpdateRoomPlayers = (count) => {
-        setRoomPlayers(count);
-      };
-    
-        socket.emit('joinRoom',{roomId:inputRoomId},(response)=>{
-            if(response.status==='success'){
-                console.log('successfully joined room');
-            }else{
+  }, []);
+
+    useEffect(() => {
+    if (socket) { // Check if socket is initialized
+        const handleUpdateRoomPlayers = (count) => {
+            setRoomPlayers(count);
+        };
+
+        socket.emit('joinRoom', { roomId: inputRoomId } , (response) => {
+            if (response.status === 'success') {
+                // socket.emit('sendSocket',socket.id);
+                console.log(`successfully joined room ${socket.id}`);
+            } else {
                 console.error(`Error joining room: ${response.message}`);
             }
+        });
+        socket.on('sendsocket',(e)=>{
+          console.log(e);
         })
-          socket.on('userSaved', handleUserSaved);
-          socket.on('updateRoomPlayers', handleUpdateRoomPlayers);
+        socket.on('updateRoomPlayers', handleUpdateRoomPlayers);
         
-          return () => {
-            socket.off('userSaved', handleUserSaved);
+        return () => {
             socket.off('updateRoomPlayers', handleUpdateRoomPlayers);
             socket.disconnect();
-          };
-    }, []);
+        };
+    }
+}, [socket, inputRoomId]);
      
     useEffect(()=>{
       const fetchData = async()=>{
@@ -65,7 +67,7 @@ const Room = () => {
       const fetchData=async()=>{
         try{
           const User = await axios.get(`http://localhost:4000/getUser/${inputRoomId}`)
-          //console.log({"User":User});
+          console.log({"User":User});
           setUser(User.data);
           if(timer==0){
           for (let i = 0; i < User.data.length; i++) {
@@ -84,7 +86,7 @@ const Room = () => {
 
     // }
     useEffect(() => {
-      if(roomPlayers>=1){
+      if(roomPlayers>=3){
       const timerInterval = setInterval(async() => {
         if (timer > 0) {
           setTimer((prevTimer) => prevTimer - 1);
@@ -92,7 +94,7 @@ const Room = () => {
           console.log("going in want 0");
           handleShowNextImage();
           setWant(0);
-          setTimer(10);
+          setTimer(20);
         }else if(want===1){
           console.log("going in want 1");
           try{
@@ -106,9 +108,10 @@ const Room = () => {
           }
           handleShowNextImage();
           setWant(0);
-          setTimer(10);
-        }else if(want>=1){
+          setTimer(20);
+        }else if(want>=2){
           //handleBid();
+          console.log("going in want 2")
         }
       }, 1000);
       return () => clearInterval(timerInterval);}
@@ -148,13 +151,13 @@ const Room = () => {
               }
                     <div className="cardcenter">
 
-                      {player.map((ele,index) => (
-                      <div key={ele._id} style={{ display: index === currImageIndex ? 'block' : 'none' }}>
+                      {/* {player.map((ele,index) => (
+                      <div key={ele._id} style={{ display: index === currImageIndex ? 'block' : 'none' }}> */}
 
-                     { userId!==null && (<Card card={ele} userId={userId} />)}
+                     { socket.id!== undefined && (<Card card={player[currImageIndex]} socketId={socket.id} />)}
                        
-                    </div>
-                    ))}
+                    {/* </div>
+                    ))} */}
                     </div>
     
               </div>

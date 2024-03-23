@@ -29,20 +29,20 @@ const io = initializeSocket(server);
 app.use(fileupload({
   useTempFiles: true
 }));
-app.put('/updateTeam',async(req,res)=>{
-  console.log(req.body);
-  const {count,index,socketId}=req.body;
+app.post('/updateTeam',async(req,res)=>{
+  const {count,index,userId}=req.body;
   try{
-    const user = await User.findOne({ socketId: socketId });
-    console.log({"user":user});
+    const user = await User.findOne({ _id: userId });
     if (user && user.team) {
       user.team[index] = count;
       await user.save(); 
+
       console.log(user);
       res.status(200).send({ message: 'Team updated successfully' });
     } else {
       res.status(404).send({ message: 'User or team not found' });
     }
+
   }catch(error){
     res.send({"Error in update team":Error})
   }
@@ -80,7 +80,8 @@ app.post('/addproduct', async(req, res) => {
           });
         });
  })
-});
+  });
+
 app.get('/listproduct',async (req,res)=>{
   try{
     const allPlayers = await Player.find();
@@ -92,6 +93,7 @@ app.get('/listproduct',async (req,res)=>{
 })
 app.get('/getUser/:inputRoomId',async (req,res)=>{
   const roomId=req.params.inputRoomId;
+  console.log({"getUserid":roomId});
   try{
     const allUser = await User.find({RoomId:roomId});
     res.status(200).json(allUser);

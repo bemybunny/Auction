@@ -3,34 +3,37 @@ import '../CSS/Card.css'
 import axios from 'axios';
 // import img from  '../assets/react.svg'
 const Card = (props) => {
-
+   //console.log(props);
    const [count,setCount]=useState(false);
     const { name, image, basePrice, credit, recentPerformance,index } = props.card;
-    const socketId=props.socketId;
-    console.log({"socketId":socketId});
-    const handlecount = async(e)=>{
-      e.preventDefault();
+    const userId=props.userId;
+    // console.log({"userId":userId});
+    // console.log({"index":index});
+    const handlecount = async()=>{
+     // console.log(count);
       setCount(!count)
+     
     }
     useEffect(()=>{
-      if (socketId === undefined) {
+      //console.log("count Changed",count);
+      if (userId === null) {
         return;
       }
       const fetchData=async()=>{
         try{
-          const response = await axios.put('http://localhost:4000/updateTeam',{
+          const response = await axios.post('http://localhost:4000/updateTeam',{
             count: count, 
             index: index,
-            socketId: socketId
+            userId: userId
           });
-          console.log({"response":response.data});
+          //console.log(response.data);
         }
         catch(error){
           console.log(error);
         }
       }
      fetchData();
-    },[count])
+    },[count,userId])
 
   return (
     <div className="card-box">
@@ -62,4 +65,4 @@ const Card = (props) => {
   )
 }
 
-export default Card;
+export default Card
